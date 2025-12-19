@@ -34,22 +34,22 @@ abstract class MyEventArgs(EventType type) : EventArgs
         float dummy = random.NextSingle();
         switch ((EventType)random.Next((int)EventType.EventMax))
         {
-            case EventType.Event1: return new MyEventArgs1(dummy);
-            case EventType.Event2: return new MyEventArgs2(dummy);
-            case EventType.Event3: return new MyEventArgs3(dummy);
-            case EventType.Event4: return new MyEventArgs4(dummy);
-            case EventType.Event5: return new MyEventArgs5(dummy);
-            case EventType.Event6: return new MyEventArgs6(dummy);
-            case EventType.Event7: return new MyEventArgs7(dummy);
-            case EventType.Event8: return new MyEventArgs8(dummy);
-            case EventType.Event9: return new MyEventArgs9(dummy);
-            case EventType.Event10: return new MyEventArgs10(dummy);
-            case EventType.Event11: return new MyEventArgs11(dummy);
-            case EventType.Event12: return new MyEventArgs12(dummy);
-            case EventType.Event13: return new MyEventArgs13(dummy);
-            case EventType.Event14: return new MyEventArgs14(dummy);
-            case EventType.Event15: return new MyEventArgs15(dummy);
-            case EventType.Event16: return new MyEventArgs16(dummy);
+            case EventType.Event1: return new SealedEventArgs1(dummy);
+            case EventType.Event2: return new SealedEventArgs2(dummy);
+            case EventType.Event3: return new SealedEventArgs3(dummy);
+            case EventType.Event4: return new SealedEventArgs4(dummy);
+            case EventType.Event5: return new SealedEventArgs5(dummy);
+            case EventType.Event6: return new SealedEventArgs6(dummy);
+            case EventType.Event7: return new SealedEventArgs7(dummy);
+            case EventType.Event8: return new SealedEventArgs8(dummy);
+            case EventType.Event9: return new SealedEventArgs9(dummy);
+            case EventType.Event10: return new SealedEventArgs10(dummy);
+            case EventType.Event11: return new SealedEventArgs11(dummy);
+            case EventType.Event12: return new SealedEventArgs12(dummy);
+            case EventType.Event13: return new SealedEventArgs13(dummy);
+            case EventType.Event14: return new SealedEventArgs14(dummy);
+            case EventType.Event15: return new SealedEventArgs15(dummy);
+            case EventType.Event16: return new SealedEventArgs16(dummy);
         }
 
         return null!;
@@ -153,6 +153,22 @@ class MyEventArgs16(float dummy) : MyEventArgs(EventType.Event16)
     public float Dummy { get; } = dummy;
 }
 
+sealed class SealedEventArgs1(float dummy) : MyEventArgs1(dummy);
+sealed class SealedEventArgs2(float dummy) : MyEventArgs2(dummy);
+sealed class SealedEventArgs3(float dummy) : MyEventArgs3(dummy);
+sealed class SealedEventArgs4(float dummy) : MyEventArgs4(dummy);
+sealed class SealedEventArgs5(float dummy) : MyEventArgs5(dummy);
+sealed class SealedEventArgs6(float dummy) : MyEventArgs6(dummy);
+sealed class SealedEventArgs7(float dummy) : MyEventArgs7(dummy);
+sealed class SealedEventArgs8(float dummy) : MyEventArgs8(dummy);
+sealed class SealedEventArgs9(float dummy) : MyEventArgs9(dummy);
+sealed class SealedEventArgs10(float dummy) : MyEventArgs10(dummy);
+sealed class SealedEventArgs11(float dummy) : MyEventArgs11(dummy);
+sealed class SealedEventArgs12(float dummy) : MyEventArgs12(dummy);
+sealed class SealedEventArgs13(float dummy) : MyEventArgs13(dummy);
+sealed class SealedEventArgs14(float dummy) : MyEventArgs14(dummy);
+sealed class SealedEventArgs15(float dummy) : MyEventArgs15(dummy);
+sealed class SealedEventArgs16(float dummy) : MyEventArgs16(dummy);
 
 [MemoryDiagnoser]
 public class Benchmark
@@ -180,7 +196,7 @@ public class Benchmark
         }
     }
 
-    [Benchmark(Baseline = true)]
+    [Benchmark]
     public void MatchOnEnum()
     {
         float sum = 0f;
@@ -277,6 +293,114 @@ public class Benchmark
                 MyEventArgs14 ea => ea.Dummy,
                 MyEventArgs15 ea => ea.Dummy,
                 MyEventArgs16 ea => ea.Dummy,
+                _ => 0,
+            };
+        };
+
+        DispatchEvents();
+
+        Console.WriteLine($"Total = {sum}");
+
+        OnEvent = null;
+    }
+
+    [Benchmark(Baseline = true)]
+    public void MatchOnEnumSealed()
+    {
+        float sum = 0f;
+
+        OnEvent += (sender, args) =>
+        {
+            sum += args.Type switch
+            {
+                EventType.Event1 => ((SealedEventArgs1)args).Dummy,
+                EventType.Event2 => ((SealedEventArgs2)args).Dummy,
+                EventType.Event3 => ((SealedEventArgs3)args).Dummy,
+                EventType.Event4 => ((SealedEventArgs4)args).Dummy,
+                EventType.Event5 => ((SealedEventArgs5)args).Dummy,
+                EventType.Event6 => ((SealedEventArgs6)args).Dummy,
+                EventType.Event7 => ((SealedEventArgs7)args).Dummy,
+                EventType.Event8 => ((SealedEventArgs8)args).Dummy,
+                EventType.Event9 => ((SealedEventArgs9)args).Dummy,
+                EventType.Event10 => ((SealedEventArgs10)args).Dummy,
+                EventType.Event11 => ((SealedEventArgs11)args).Dummy,
+                EventType.Event12 => ((SealedEventArgs12)args).Dummy,
+                EventType.Event13 => ((SealedEventArgs13)args).Dummy,
+                EventType.Event14 => ((SealedEventArgs14)args).Dummy,
+                EventType.Event15 => ((SealedEventArgs15)args).Dummy,
+                EventType.Event16 => ((SealedEventArgs16)args).Dummy,
+                _ => 0,
+            };
+        };
+
+        DispatchEvents();
+
+        Console.WriteLine($"Total = {sum}");
+
+        OnEvent = null;
+    }
+
+    [Benchmark]
+    public void MatchOnEnumVirtualSealed()
+    {
+        float sum = 0f;
+
+        OnEvent += (sender, args) =>
+        {
+            sum += args.TypeVirtual switch
+            {
+                EventType.Event1 => ((SealedEventArgs1)args).Dummy,
+                EventType.Event2 => ((SealedEventArgs2)args).Dummy,
+                EventType.Event3 => ((SealedEventArgs3)args).Dummy,
+                EventType.Event4 => ((SealedEventArgs4)args).Dummy,
+                EventType.Event5 => ((SealedEventArgs5)args).Dummy,
+                EventType.Event6 => ((SealedEventArgs6)args).Dummy,
+                EventType.Event7 => ((SealedEventArgs7)args).Dummy,
+                EventType.Event8 => ((SealedEventArgs8)args).Dummy,
+                EventType.Event9 => ((SealedEventArgs9)args).Dummy,
+                EventType.Event10 => ((SealedEventArgs10)args).Dummy,
+                EventType.Event11 => ((SealedEventArgs11)args).Dummy,
+                EventType.Event12 => ((SealedEventArgs12)args).Dummy,
+                EventType.Event13 => ((SealedEventArgs13)args).Dummy,
+                EventType.Event14 => ((SealedEventArgs14)args).Dummy,
+                EventType.Event15 => ((SealedEventArgs15)args).Dummy,
+                EventType.Event16 => ((SealedEventArgs16)args).Dummy,
+                _ => 0,
+            };
+        };
+
+        DispatchEvents();
+
+        Console.WriteLine($"Total = {sum}");
+
+        OnEvent = null;
+    }
+
+    [Benchmark]
+    public void MatchOnTypeSealed()
+    {
+        float sum = 0f;
+
+        OnEvent += (sender, args) =>
+        {
+            sum += args switch
+            {
+                SealedEventArgs1  ea => ea.Dummy,
+                SealedEventArgs2  ea => ea.Dummy,
+                SealedEventArgs3  ea => ea.Dummy,
+                SealedEventArgs4  ea => ea.Dummy,
+                SealedEventArgs5  ea => ea.Dummy,
+                SealedEventArgs6  ea => ea.Dummy,
+                SealedEventArgs7  ea => ea.Dummy,
+                SealedEventArgs8  ea => ea.Dummy,
+                SealedEventArgs9  ea => ea.Dummy,
+                SealedEventArgs10 ea => ea.Dummy,
+                SealedEventArgs11 ea => ea.Dummy,
+                SealedEventArgs12 ea => ea.Dummy,
+                SealedEventArgs13 ea => ea.Dummy,
+                SealedEventArgs14 ea => ea.Dummy,
+                SealedEventArgs15 ea => ea.Dummy,
+                SealedEventArgs16 ea => ea.Dummy,
                 _ => 0,
             };
         };
