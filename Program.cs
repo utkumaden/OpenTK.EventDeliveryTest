@@ -154,6 +154,7 @@ class MyEventArgs16(float dummy) : MyEventArgs(EventType.Event16)
 }
 
 
+[MemoryDiagnoser]
 public class Benchmark
 {
     const int NumberOfEventsToGenerate = 32 * (1 << 20);
@@ -179,7 +180,7 @@ public class Benchmark
         }
     }
 
-    [Benchmark]
+    [Benchmark(Baseline = true)]
     public void MatchOnEnum()
     {
         float sum = 0f;
